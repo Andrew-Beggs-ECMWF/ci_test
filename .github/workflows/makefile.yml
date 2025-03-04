@@ -1,0 +1,22 @@
+name: Make docs
+
+on:
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Make html
+      run: make -C drhook html
+
+    - name: Make pdf
+      run: make -C drhook latexpdf
+
+    - name: Make md
+      run: make -C drhook markdown
