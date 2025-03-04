@@ -19,6 +19,9 @@ jobs:
         cache: 'pip' # caching pip dependencies
     - run: pip install -r requirements.txt
 
+    - name: Install latexmk
+      run: sudo apt install -y latexmk
+
     - name: Make html
       run: make -C drhook html
 
