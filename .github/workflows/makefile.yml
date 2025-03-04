@@ -20,7 +20,7 @@ jobs:
     - run: pip install -r requirements.txt
 
     - name: Install latexmk
-      run: sudo apt install -y latexmk texlive
+      run: sudo apt install -y latexmk texlive-latex-extra
 
     - name: Make html
       run: make -C drhook html
