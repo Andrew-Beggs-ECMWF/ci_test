@@ -1,0 +1,1592 @@
+\section{Flags \& Environment variables}
+
+\subsection{\texttt{"DR\_HOOK\_SHOW\_LOCK"}}
+\label{section:flags:DR_HOOK_SHOW_LOCK}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+ \hfill
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Used to specify if lock debug info should be output. This is on initialisation only.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+This is done by enabling \texttt{OML\_DEBUG} in the \textit{OML} library, initialising a new lockid, and then restoring the original value.
+
+This debug info takes the following format:\\
+\verb|oml_init_lockid_with_name "|\textit{lock\_name}\verb|" : |\textit{lock\_ID}\verb|, |\textit{lock\_address}
+
+\todo{Written - Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"OMP\_STACKSIZE"}}
+\label{section:flags:OMP_STACKSIZE}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <number> <suffix>+ \\
+\verb+number ::= <digit> | <number> <digit>+ \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+\\
+\verb+suffix ::= '' | 'G' | 'M' | 'K'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies an indicative stack size the master thread should not exceed.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+This is an overloaded environment variable, used primarily by \textit{OpenMP}.
+
+It will only be read if \hyperref[section:flags:DR_HOOK_TRACE_STACK]{\texttt{"DR\_HOOK\_TRACE\_STACK"}} is also set.
+
+\texttt{OMP\_STACKSIZE} is scaled by \verb|opt_trace_stack|, obtained from \hyperref[section:flags:DR_HOOK_TRACE_STACK]{\texttt{"DR\_HOOK\_TRACE\_STACK"}}, to give \verb|drhook_stacksize_threshold|. If \verb|drhook_stacksize_threshold| is exceeded by the master thread during a \verb|random_memstat| check, an abort will occur.
+
+The stack size can be specified in GiB, MiB, or KiB using the suffix \texttt{G}, \texttt{M}, or \texttt{K} respectively. A lack of suffix will imply the stack size is in bytes. If multiple suffixes are specified, then the largest specified will be chosen. The stack size is truncated at the first occurring suffix.
+
+The size is limited to the size of \verb|long long int|.
+
+An invalid or negative input size will result in a default of \texttt{0}.
+
+\todo{Written - Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_CATCH\_SIGNALS"}}
+\label{section:flags:DR_HOOK_CATCH_SIGNALS}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <signal> |  <valid_value> <delim> <signal>+ \\
+\verb+delim ::= ',' | ' ' | '\t' | '/'+ \\
+\verb+signal ::= '-1' | <number>+\\
+\verb+number ::= <digit> | <number> <digit> | <number> '0'+ \\
+\verb+digit ::= '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies a list of signals to be caught and handled by \drhook.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+
+If \verb|signal| $= -1$, then all available catchable signals are registered to be caught and handled by \drhook. Any value after $-1$ will be discarded.
+
+All other values will be silently discarded.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_RESTORE\_DEFAULT\_SIGNALS"}}
+\label{section:flags:DR_HOOK_RESTORE_DEFAULT_SIGNALS}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <signal> |  <valid_value> <delim> <signal>+ \\
+\verb+delim ::= ',' | ' ' | '\t' | '/'+ \\
+\verb+signal ::= '-1' | <number>+\\
+\verb+number ::= <digit> | <number> <digit> | <number> '0'+ \\
+\verb+digit ::= '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies a list of signals to have their default handler restored, if they haven't been set to be ignored.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+
+If \verb|signal| $= -1$, then all available catchable signals have their default signal handler restored. Any value after $-1$ will be discarded.
+
+All other values will be silently discarded.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_IGNORE\_SIGNALS"}}
+\label{section:flags:DR_HOOK_IGNORE_SIGNALS}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <signal> |  <valid_value> <delim> <signal>+ \\
+\verb+delim ::= ',' | ' ' | '\t' | '/'+ \\
+\verb+signal ::= '-1' | <number>+\\
+\verb+number ::= <digit> | <number> <digit> | <number> '0'+ \\
+\verb+digit ::= '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies a list of signals to be ignored by \drhook. This means \drhook will not handle these signals when they occur.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+
+If \verb|signal| $= -1$, then all available catchable signals are set to inactive and be ignored by \drhook. Any value after $-1$ will be discarded.
+
+All other values will be silently discarded.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_SILENT"}} \label{section:flags:DR_HOOK_SILENT}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Used to enable or disable debug prints to \verb|STDERR|.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+This is not recommended during production run due to the excessive slowdown caused by printing.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_INIT\_SIGNALS"}}
+\label{section:flags:DR_HOOK_INIT_SIGNALS}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies if signals should be initialised via \drhook (dangerous, but sometimes necessary).
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+\todo{Not certain on exactly what it does. }
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_SHOW\_PROCESS\_OPTIONS"}}
+\label{section:flags:DR_HOOK_SHOW_PROCESS_OPTIONS}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <number> | '-1'+ \\
+\verb+number ::= <digit> | <number> <digit> | <number> '0'+ \\
+\verb+digit ::= '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies processIDs for which all options will be output \todo{Where?}.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+If this option isn't specified, and \hyperref[section:flags:DR_HOOK_SILENT]{\texttt{DR\_HOOK\_SILENT}} doesn't evaluate to \verb|True|, then this will default to the process with ID \verb|1|.
+
+Specifying \verb|-1| will enable this for all processes.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"ATP\_ENABLED"}}
+\label{section:flags:ATP_ENABLED}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Enable \href{https://cpe.ext.hpe.com/docs/debugging-tools/atp.1.html}{Abnormal Termination Processing (\textit{ATP}) mode for \textit{Cray} systems}. This will pass certain signals to \textit{ATP} instead of \drhook.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+If nothing is specified, then this will default to \texttt{0}.
+
+This will also enable the following flags within \drhook:
+\begin{itemize}
+    \item \textit{ATP\_MAX\_CORES}
+    \item \textit{ATP\_MAX\_ANALYSIS\_TIME}
+    \item \textit{ATP\_IGNORE\_SIGTERM}
+\end{itemize}
+
+The signals passed to ATP are:
+\begin{itemize}
+    \item \texttt{SIGINT}
+    \item \texttt{SIGFPE}
+    \item \texttt{SIGILL}
+    \item \texttt{SIGTRAP}
+    \item \texttt{SIGABRT}
+    \item \texttt{SIGBUS}
+    \item \texttt{SIGSEGV}
+    \item \texttt{SIGSYS}
+    \item \texttt{SIGXCPU}
+    \item \texttt{SIGXFSZ}
+    \item \texttt{SIGTERM}
+    \begin{itemize}
+        \item \texttt{SIGTERM} is only passed to ATP if \hyperref[section:flags:ATP_IGNORE_SIGTERM]{\texttt{ATP\_IGNORE\_SIGTERM}} is set
+    \end{itemize}
+\end{itemize}
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"ATP\_MAX\_CORES"}}
+\label{section:flags:ATP_MAX_CORES}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <number>+ \\
+\verb+number ::= <digit> | <number> <digit>+ \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Used as a multiplier for calculating the spin wait time for all cores to dump if \textit{ATP} is enabled and handling signals.
+
+Also used along with \hyperref[section:flags:ATP_ENABLED]{\texttt{ATP\_ENABLED}} to determine if any cores are being dumped by \textit{ATP}.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+This is an overloaded environment variable, used primarily for \textit{ATP}. If nothing is specified, then this will default to \texttt{20}.
+
+This will only be enable if the \hyperref[section:flags:ATP_ENABLED]{\texttt{ATP\_ENABLED}} flag evaluates to \verb|True|.
+
+The size is limited to the size of \verb|int|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"ATP\_MAX\_ANALYSIS\_TIME"}}
+\label{section:flags:ATP_MAX_ANALYSIS_TIME}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <number>+ \\
+\verb+number ::= <digit> | <number> <digit>+ \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Used as a base value for calculating the spin wait time for all cores to dump if \textit{ATP} is enabled and handling signals.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+This is an overloaded environment variable, used primarily for \textit{ATP}. If nothing is specified, then this will default to \texttt{300}.
+
+This will only be enable if the \hyperref[section:flags:ATP_ENABLED]{\texttt{ATP\_ENABLED}} flag evaluates to \verb|True|.
+
+The minimum between \texttt{"ATP\_MAX\_ANALYSIS\_TIME"} and \texttt{drhook\_harakiri\_timeout} (set by \hyperref[section:flags:DR_HOOK_HARAKIRI_TIMEOUT]{\texttt{DR\_HOOK\_HARAKIRI\_TIMEOUT}}) is chosen as the base for calculating the time to spin wait for \textit{ATP} to finish handling a signal, through the following:
+
+\verb|int secs = MIN(drhook_harakiri_timeout,atp_max_analysis_time);|\\
+\verb|secs = 60 + MIN(tdiff * (atp_max_cores-1),secs);|
+
+The size is limited to the size of \verb|int|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"ATP\_IGNORE\_SIGTERM"}}
+\label{section:flags:ATP_IGNORE_SIGTERM}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Determines if \texttt{SIGTERM} should be handled by \drhook or \textit{ATP}.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+This is an overloaded environment variable, used primarily for \textit{ATP}. If nothing is specified, then this will default to \texttt{0}.
+
+This will only be enable if the \hyperref[section:flags:ATP_ENABLED]{\texttt{ATP\_ENABLED}} flag evaluates to \verb|True|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_ALLOW\_COREDUMP"}}
+\label{section:flags:DR_HOOK_ALLOW_COREDUMP}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <number> | '-1'+ \\
+\verb+number ::= <digit> | <number> <digit>+ \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies both if core dumping should be enabled, and if so, which processes.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+
+If \texttt{DR\_HOOK\_ALLOW\_COREDUMP} evaluates to $1\leq$\texttt{process}$\leq$\texttt{\# of processes} then only the specified process has core dumping enabled.
+
+If \texttt{DR\_HOOK\_ALLOW\_COREDUMP} evaluates to -1 then core dumping is enabled for all processes.
+
+If \texttt{DR\_HOOK\_ALLOW\_COREDUMP} evaluates to 0 then core dumping is disabled.
+
+% -1 denotes ALL MPI-tasks, 1..NPES == myproc, 0 = coredump will not be enabled by DrHook at init
+\todo{It doesn't seem like this value matters apart from zero vs non-zero?}
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_PROFILE"}}
+\label{section:flags:DR_HOOK_PROFILE}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <char> | <valid_value> <char>+ \\
+\verb+char ::= <letter> | <digit> | <symbol>+ \\
+\verb+letter ::= <lower> | <upper>+ \\
+\verb+upper ::= 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | +\\
+ \verb+'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' |+\\
+ \verb+'W' | 'X' | 'Y' | 'Z'+
++ \\
+\verb+lower ::= 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' |+\\
+\verb+'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' |+\\
+\verb+'w' | 'x' | 'y' | 'z'+\\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+ \\
+\verb+symbol ::= ' \' | '!' | '"' | '#' | '$' | '%' | '&' | ''' | '(' | ')' |+\\
+\verb!'*' | '+' | ',' | '-' | '.' | ':' | ';' | '<' | '=' | '>' | '?' | '@' |!
+\verb!'[' | '' | ']' | '^' | '_' | '`' | '{' | '|' | '}' | '~'!
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies where to output profiles.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+While \texttt{DR\_HOOK\_PROFILE} is just to be a valid file name, many of the valid symbols are not recommended for obvious reasons.
+
+If a relative path is used, then it will be relative to the rundir of the binary \drhook is linked to.
+
+If \texttt{DR\_HOOK\_PROFILE} doesn't contain the character \texttt{\%}, then \texttt{.\%d} will be appended.
+
+If \hyperref[section:flags:DR_HOOK_PROFILE_PROC]{\texttt{"DR\_HOOK\_PROFILE\_PROC"}} is set and valid, but \texttt{"DR\_HOOK\_PROFILE"} is not set, then \\\texttt{"DR\_HOOK\_PROFILE"} defaults to \verb|drhook.prof.%d|.
+
+If \drhook fails to set the process specific patch string either due to an error or process configuration, then it will default to \verb|drhook.prof.0|.
+
+\texttt{"DR\_HOOK\_PROFILE"} is also indirectly used in \texttt{get\_memmon\_out}. \verb|-mem| is simply appended to the previously described path.
+
+This option is only used in profiling and memory profiling modes.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_PROFILE\_PROC"}}
+\label{section:flags:DR_HOOK_PROFILE_PROC}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <number> | '-1'+ \\
+\verb+number ::= <digit> | <number> <digit>+ \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Used to specify which process, or all processes, that should output profiling data.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+If \texttt{"DR\_HOOK\_PROFILE\_PROC"} is \verb|-1|, then all processes will out profiling data. All other valid values will result in the one specified process outputting its data.
+
+If this option isn't specified, then it will default to \verb|-1|.
+
+The size is limited to the size of \verb|double|.
+
+This option is only used in profiling and memory profiling modes.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_PROFILE\_LIMIT"}}
+\label{section:flags:DR_HOOK_PROFILE_LIMIT}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <number> | <number> '.' <number> + \\
+\verb+number ::= <digit> | <number> <digit>+ \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies at which percentage of the maximum value data points should be dropped from profiling outputs.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+If this option isn't specified, then it will default to \verb|-10|.
+
+The size is limited to the size of \verb|double|.
+
+This option is only used in profiling and memory profiling modes.
+% Lowest percentage accepted into the printouts
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_FUNCENTER"}}
+\label{section:flags:DR_HOOK_FUNCENTER}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <digit> | <valid_value> <digit>+ \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Used to specify a thread to print memory and stack information to stdout upon entering a function.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+If this option isn't specified, then it will default to \verb|0|.
+
+This will also set \texttt{opt\_gethwm} and \texttt{opt\_getstk} to \verb|1|, that are usually handled by \hyperref[section:flags:DR_HOOK_OPT]{\texttt{"DR\_HOOK\_OPT"}}.
+
+To see when a process exits a function, use \hyperref[section:flags:DR_HOOK_FUNCEXIT]{\texttt{"DR\_HOOK\_FUNCEXIT"}}.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_FUNCEXIT"}}
+\label{section:flags:DR_HOOK_FUNCEXIT}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <digit> | <valid_value> <digit>+ \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Used to specify a thread to print memory and stack information to stdout upon exiting a function.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+If this option isn't specified, then it will default to \verb|0|.
+
+This will also set \texttt{opt\_gethwm} and \texttt{opt\_getstk} to \verb|1|, that are usually handled by \hyperref[section:flags:DR_HOOK_OPT]{\texttt{"DR\_HOOK\_OPT"}}.
+
+To see when a process enters a function, use \hyperref[section:flags:DR_HOOK_FUNCENTER]{\texttt{"DR\_HOOK\_FUNCENTER"}}.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_TIMELINE"}}
+\label{section:flags:DR_HOOK_TIMELINE}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <number> | '-1'+ \\
+\verb+number ::= <digit> | <number> <digit>+ \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Used to enable timeline mode for either all processes or a specific process.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+If \texttt{"DR\_HOOK\_TIMELINE"} is \verb|-1|, then all processes will have timeline mode enabled. All other non-zero valid values will result in the one specified process having timeline mode enabled.
+
+If this option isn't specified, then it will default to \verb|0|.
+
+Setting \texttt{"DR\_HOOK\_TIMELINE"} to a non-zero value also causes \drhook to check the following options:
+\begin{itemize}
+    \item \hyperref[section:flags:DR_HOOK_TIMELINE_THREAD]{\texttt{DR\_HOOK\_TIMELINE\_THREAD}}
+    \item \hyperref[section:flags:DR_HOOK_TIMELINE_FORMAT]{\texttt{DR\_HOOK\_TIMELINE\_FORMAT}}
+    \item \hyperref[section:flags:DR_HOOK_TIMELINE_UNITNO]{\texttt{DR\_HOOK\_TIMELINE\_UNITNO}}
+    \item \hyperref[section:flags:DR_HOOK_TIMELINE_FREQ]{\texttt{DR\_HOOK\_TIMELINE\_FREQ}}
+    \item \hyperref[section:flags:DR_HOOK_TIMELINE_MB]{\texttt{DR\_HOOK\_TIMELINE\_MB}}
+\end{itemize}
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_TIMELINE\_THREAD"}}
+\label{section:flags:DR_HOOK_TIMELINE_THREAD}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <number>+ \\
+\verb+number ::= <digit> | <number> <digit>+ \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Used to specify which threads should output timeline info upon entry and exit of a region.
+
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+If timeline mode is enabled via \hyperref[section:flags:DR_HOOK_TIMELINE]{\texttt{"DR\_HOOK\_TIMELINE"}}, then for all threads in the range $1 \rightarrow n$ (inclusive) \drhook will print timeline information on both entry and exit from a region. \drhook will also print the sum of \textit{all threads} for the first thread.\todo{Which info gets summed? is it all?}
+
+If \texttt{"DR\_HOOK\_TIMELINE\_THREAD"} is set to \verb|0|, then all n will be set so as to cover all threads and the behaviour is identical to the above.
+
+% <= 0 print for all threads
+% 1 -> #1 only [but curheap still SUM of all threads] (default),
+% n -> print for increasing number of threads separately : [1..n] */
+While not strictly valid, any value less than \verb|0| will have the same behaviour as \verb|0|.
+
+If this option isn't specified, then it will default to \verb|1|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_TIMELINE\_FORMAT"}}
+\label{section:flags:DR_HOOK_TIMELINE_FORMAT}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Used to specify if timeline information should be output in value only or verbose mode.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+% /* if 1, print only {wall,hwm,rss,curheap} w/o labels "wall=" etc.; else fully expanded fmt */
+This option is only available if timeline mode is enabled via \hyperref[section:flags:DR_HOOK_TIMELINE]{\texttt{"DR\_HOOK\_TIMELINE"}}.
+
+If \texttt{"DR\_HOOK\_TIMELINE\_FORMAT"} is \verb|1|, then the following value only formatter will be used:
+
+\verb|"%.6f %.4g %.4g %.4g %.4g"|
+
+Otherwise, the verbose r is used:
+
+\verb|"wall=%.6f cpu=%.4g hwm=%.4g rss=%.4g curheap=%.4g stack=%.4g|
+
+\verb|vmpeak=%.4g pag=%lld"|
+
+If this option isn't specified, then it will default to \verb|1|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_TIMELINE\_UNITNO"}}
+\label{section:flags:DR_HOOK_TIMELINE_UNITNO}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <digit> | <valid_value> <digit>+ \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies the unit number to be used for timeline output.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+% /* Fortran unit number : default = 6 i.e. stdout */
+This option is only available if timeline mode is enabled via \hyperref[section:flags:DR_HOOK_TIMELINE]{\texttt{"DR\_HOOK\_TIMELINE"}}.
+
+\texttt{"DR\_HOOK\_TIMELINE\_UNITNO"} must be an integer between 1 and 99. Some unit numbers are reserved: 5 is standard input, 6 is standard output.
+
+As the value of \texttt{"DR\_HOOK\_TIMELINE\_UNITNO"} has to be interpreted by \texttt{atoi}, only integer unit numbers are valid.
+
+If \verb|0| is specified, then timeline outputs are silently ignored.
+
+If this option isn't specified, then it will default to \verb|6|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_TIMELINE\_FREQ"}}
+\label{section:flags:DR_HOOK_TIMELINE_FREQ}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <digit> | <valid_value> <digit> | <valid_value> '0'+ \\
+\verb+digit ::= '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Used to specify how many nth region's entries/exits should be output during timeline mode.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+% /* How often to print : every n-th call : default = every 10^6 th call or ... */
+This option is only available if timeline mode is enabled via \hyperref[section:flags:DR_HOOK_TIMELINE]{\texttt{"DR\_HOOK\_TIMELINE"}}.
+
+If a region is entered/exited and it isn't the nth call, but the resident set size does vary by more than \hyperref[section:flags:DR_HOOK_TIMELINE_MB]{\texttt{"DR\_HOOK\_TIMELINE\_MB"}}, then it is output anyway.
+
+A value less than \verb|1| will silently disable timeline mode.
+
+The size is limited to the size of \verb|long long int|.
+
+If this option isn't specified, then it will default to \verb|1000000|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_TIMELINE\_MB"}}
+\label{section:flags:DR_HOOK_TIMELINE_MB}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <number> | <number> '.' <number> + \\
+\verb+number ::= <digit> | <number> <digit>+ \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+This specifies how much the resident set size needs to vary by, in MB, before \hyperref[section:flags:DR_HOOK_TIMELINE_FREQ]{\texttt{"DR\_HOOK\_TIMELINE\_FREQ"}} is overridden.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+% /* ... rss or curheap jumps up/down by more than this many MBytes (default = 1) : unit MBytes */
+This option is only available if timeline mode is enabled via \hyperref[section:flags:DR_HOOK_TIMELINE]{\texttt{"DR\_HOOK\_TIMELINE"}}.
+
+A value less than \verb|0| will be set to \verb|1.0|.
+
+The size is limited to the size of \verb|double|.
+
+If this option isn't specified, then it will default to \verb|1.0|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_TRACE\_STACK"}}
+\label{section:flags:DR_HOOK_TRACE_STACK}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <number> | <number> '.' <number> + \\
+\verb+number ::= <digit> | <number> <digit>+ \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+A multiplier for \hyperref[section:flags:OMP_STACKSIZE]{\texttt{"OMP\_STACKSIZE"}}, to monitor high master thread stack usage.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+% if > 0, a multiplier for OMP_STACKSIZE to monitor high master thread stack usage --
+% -- implies opt_random_memstat = 1 (regardless of DR_HOOK_RANDOM_MEMSTAT setting)
+% -- for master MPI task only (for the moment)
+As described for \hyperref[section:flags:OMP_STACKSIZE]{\texttt{"OMP\_STACKSIZE"}}, \texttt{"DR\_HOOK\_TRACE\_STACK"} is used to scale the value of \\\hyperref[section:flags:OMP_STACKSIZE]{\texttt{"OMP\_STACKSIZE"}} to give \verb|drhook_stacksize_threshold|. If \\\verb|drhook_stacksize_threshold| is exceeded by the master thread during a \verb|random_memstat| check, an abort will occur.
+
+\texttt{"DR\_HOOK\_TRACE\_STACK"} being defined and non-zero also implies \verb|opt_random_memstat| has a value of \verb|1| (meaning it will always trigger a \verb|random_memstat| check on entry to a \drhook region), regardless of the value of \hyperref[section:flags:DR_HOOK_RANDOM_MEMSTAT]{\texttt{"DR\_HOOK\_RANDOM\_MEMSTAT"}}. However, if \hyperref[section:flags:DR_HOOK_RANDOM_MEMSTAT]{\texttt{"DR\_HOOK\_RANDOM\_MEMSTAT"}} is defined, it will override this value.
+
+A value less than \verb|0| will be set to \verb|0|. Additionally, \texttt{drhook\_stacksize\_threshold} won't be scaled, and \texttt{opt\_random\_memstat} is not set to \verb|1|.
+
+The size is limited to the size of \verb|double|.
+
+If this option isn't specified, then it will default to \verb|0|.
+
+\todo{Written - Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_RANDOM\_MEMSTAT"}}
+\label{section:flags:DR_HOOK_RANDOM_MEMSTAT}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <digit> | <valid_value> <digit> + \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Used to enable random memstat checks, and how often to do it.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+% /* > 0 if to obtain random memory stats (maxhwm, maxstk) for tid=1. Updated when rand() % opt_random_memstat == 0 */
+ The random memstat check is done when a \drhook region is entered and\\ \verb|rand() % opt_random_memstat == 0|, or unconditionally when the feature is explicitly, or implicitly (see \hyperref[section:flags:DR_HOOK_TRACE_STACK]{\texttt{"DR\_HOOK\_TRACE\_STACK"}}) enabled.
+
+ Due to the implementation of the random check, the value of \texttt{"DR\_HOOK\_RANDOM\_MEMSTAT"} is important in ways that may not be immediately obvious. For example, a value of \verb|2| will result in a check every other entry to a \drhook region on average. Whereas a sufficiently large number will only result in a check every \verb|1/RAND_MAX| times on average.
+
+A value greater than \verb|RAND_MAX| will be set to \verb|RAND_MAX|.
+
+A value less than \verb|0| will be set to \verb|0|, effectively disabling the feature.
+
+The size is limited to the size of \verb|int|.
+
+If this option isn't specified, then it will default to \verb|0|.
+
+\todo{Written - Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_HASHBITS"}}
+\label{section:flags:DR_HOOK_HASHBITS}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <digit> | <valid_value> <digit> + \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+\todo{Not entirely sure}
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+
+A value greater than \verb|RAND_MAX| will be set to \verb|RAND_MAX|.
+
+A value less than \verb|0| will be set to \verb|0|.
+
+The value of \texttt{"DR\_HOOK\_HASHBITS"}, \verb|nhash|, is also used to update the values of \verb|hashsize| and \verb|hashmask|. This is done for \verb|hashsize| via the following:\\
+\verb|static unsigned int hashsize = ((unsigned int)1<<(nhash));|\\
+For \verb|hashmask| it is:\\
+\verb|static unsigned int hashmask = (((unsigned int)1<<(nhash))-1);|
+
+The size is limited to the size of \verb|int|.
+
+If this option isn't specified, then it will default to the definition of \verb|NHASH|, typically \verb|16|. As such, \verb|hashsize| and \verb|hashmask| default to \texttt{65536} and \texttt{65535}, respectively.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_NCALLSTACK"}}
+\label{section:flags:DR_HOOK_NCALLSTACK}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <digit> | <valid_value> <digit> + \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+\todo{not entirely sure what this does. Why is it only needed for sp? How does dp manage the keys?}
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+% sets maxdepth
+% == 0 is dp
+% > 0 is sp
+% being overloaded to set the size of something based on a union type
+
+% /* This compile definition serves as default which can still be overwritten using environment variable with same name */
+% /* > 0 : USE call stack approach : needed for single precision version */
+% /* == 0 : do NOT use call stack approach : usually for double precision version */
+This is an overloaded value with 2\todo{?} functions. The first is to set the precision used by \drhook, which also determines which method is used to X. A performance penalty is incurred when using the single precision mode (valid non-zero values), and so is not recommended.
+
+The second function of \texttt{"DR\_HOOK\_NCALLSTACK"}, is to act as a parameter when in single precision mode. This parameter sets the maximum stack depth allowed. You must be careful when selecting this that a sufficient depth is chosen. If the depth is exceeded, then \drhook will abort.
+
+A value less than \verb|0| will be set to \verb|0|, effectively selecting double precision.
+
+The size is limited to the size of \verb|int|.
+
+If this option isn't specified, then it will default to \verb|0|, which enables double precision mode.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_HARAKIRI\_TIMEOUT"}}
+\label{section:flags:DR_HOOK_HARAKIRI_TIMEOUT}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <digit> | <valid_value> <digit> + \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+A timeout for when to kill threads that may have hung.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+% Strategy:
+%       - drhook intercepts most interrupts.
+%       - 1st interupt will
+%       - call alarm(10) to try to make sure 2nd interrupt received
+%       - try to call tracebacks and exit (which includes atexits)
+%       - 2nd (and subsequent) interupts will
+%       - spin for 20 sec (to give 1st interrupt time to complete tracebacks)
+%       - and then call _exit (bypassing atexit)
+\texttt{"DR\_HOOK\_HARAKIRI\_TIMEOUT"} is used in three places. The first is when a signal is first caught by \drhook; it is used as the timeout for \texttt{alarm()}. This is to prevent hangs by triggering a second signal when the \texttt{alarm()} expires. This second signal then takes an alternative path for subsequent signals where the second use case of \texttt{"DR\_HOOK\_HARAKIRI\_TIMEOUT"} occurs. Here it is used to spin for $\texttt{"DR\_HOOK\_HARAKIRI\_TIMEOUT"} + 60$ seconds before the thread is killed using \texttt{SIGKILL}. This is to allow for tracebacks to complete.
+
+The third place it is used, is in conjunction with \hyperref[section:flags:ATP_MAX_ANALYSIS_TIME]{\texttt{"ATP\_MAX\_ANALYSIS\_TIME"}}. Here it is used in the following way to allow \textit{ATP} to dump cores:
+
+\verb|int secs = MIN(drhook_harakiri_timeout,atp_max_analysis_time);|\\
+\verb|secs = 60 + MIN(tdiff * (atp_max_cores-1),secs);|
+
+The timeout is specified in seconds.
+
+A value less than \verb|0| will be set to the definition of \verb|drhook_harakiri_timeout_default|, typically \verb|500|.
+
+The size is limited to the size of \verb|int|.
+
+If this option isn't specified, then it will default to the definition of \verb|drhook_harakiri_timeout_default|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_USE\_LOCKFILE"}}
+\label{section:flags:DR_HOOK_USE_LOCKFILE}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Toggles the use of a lockfile, \verb|"drhook_lock"|, for outputting which thread handled a signal first.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+When enabled, this will enable a lockfile when handling signals in \drhook. This lockfile, \verb|"drhook_lock"|\todo{Where?}, will contain the number of the thread which got the lock first.\todo{Does this imply that this thread triggered the signal?}
+
+\texttt{"DR\_HOOK\_USE\_LOCKFILE"} having a value evaluating to \texttt{1}, will also disable some output regarding the use of \hyperref[section:flags:DR_HOOK_USE_LOCKFILE]{\texttt{"DR\_HOOK\_USE\_LOCKFILE"}} in it's alternative path for subsequent signals.
+
+Any non-zero valid integer value will be set to \verb|1|.
+
+If this option isn't specified, then it will default to \verb|1|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_TRAPFPE"}}
+\label{section:flags:DR_HOOK_TRAPFPE}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Toggles if floating point exceptions should be trapped, regardless of compiler settings.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+If \texttt{"DR\_HOOK\_TRAPFPE"} evaluates to \texttt{1}, then \drhook will trap floating point exceptions regardless of compilation settings. A value of \texttt{0} will instead rely on the compiler flags used, e.g. \texttt{-Ktrap=fp}.\todo{Talk about preprocessor guards}
+
+Any non-zero valid integer value will be set to \verb|1|.
+
+If this option isn't specified, then it will default to \verb|1|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_TRAPFPE\_INVALID"}}
+\label{section:flags:DR_HOOK_TRAPFPE_INVALID}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Toggles whether invalid operation floating point exceptions should be trapped.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+This will only be enabled if \hyperref[section:flags:DR_HOOK_TRAPFPE]{\texttt{"DR\_HOOK\_TRAPFPE"}} evaluates to \texttt{1} or the compiler had trapping of floating point exceptions enabled.
+
+These invalid operations are defined by IEEE 754 standard.
+
+If the exception is not trapped, then the result of the operation is \verb|NaN|.
+
+Any non-zero valid integer value will be set to \verb|1|.
+
+If this option isn't specified, then it will default to \verb|1|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_TRAPFPE\_DIVBYZERO"}}
+\label{section:flags:}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Toggles whether divide by zero floating point exceptions should be trapped.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+This will only be enabled if \hyperref[section:flags:DR_HOOK_TRAPFPE]{\texttt{"DR\_HOOK\_TRAPFPE"}} evaluates to \texttt{1} or the compiler had trapping of floating point exceptions enabled.
+
+This exception occurs when a finite nonzero number is divided by zero.
+
+Any non-zero valid integer value will be set to \verb|1|.
+
+If this option isn't specified, then it will default to \verb|1|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_TRAPFPE\_OVERFLOW"}}
+\label{section:flags:}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Toggles whether overflow floating point exceptions should be trapped.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+This will only be enabled if \hyperref[section:flags:DR_HOOK_TRAPFPE]{\texttt{"DR\_HOOK\_TRAPFPE"}} evaluates to \texttt{1} or the compiler had trapping of floating point exceptions enabled.
+
+This exception occurs when the result of a calculation cannot be represented as a finite value in the precision format of the destination. This behaviour is affected by rounding modes.
+
+Any non-zero valid integer value will be set to \verb|1|.
+
+If this option isn't specified, then it will default to \verb|1|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_TIMED\_KILL"}}
+\label{section:flags:DR_HOOK_TIMED_KILL}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <formatted> |  <valid_value> <delim> <formatted>+ \\
+\verb+delim ::= ',' | ' ' | '\t' | '/'+ \\
+\verb+formatted ::= <id> ':' <id> ':' <integer> ':' <double>+\\
+\verb+double ::= <double_part> | 'double_part' '.' <double_part>+ \\
+\verb+double_part ::= <digit_0> | <double_part> <digit_0>+ \\
+\verb+digit_0 ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+\\
+\verb+id = <integer> | '-1'+\\
+\verb+integer ::= <digit> | <integer> <digit> | <integer> '0'+ \\
+\verb+digit ::= '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Set timers for specific, or all, threads to trigger signals. This is a developer option.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+% /* Timer assisted simulated kill of procs/threads by signal */
+The parameters provided to \texttt{"DR\_HOOK\_TIMED\_KILL"} (\verb|target_process|,\\ \verb|target_oml_thread_id|, \verb|target_signal|, and \verb|start_time|) are in the following pattern:
+
+\verb|target_process:target_oml_thread_id:target_signal:start_time|
+
+Note that:
+\begin{itemize}
+    \item \verb|target_process| can be a valid integer for a single process, or \texttt{-1} for all.
+    \item \verb|target_oml_thread_id| can be a valid integer for a single thread, or \texttt{-1} for all.
+    \item \verb|target_signal| must be valid for your system.
+    \item \verb|start_time| must be non-zero.
+\end{itemize}
+Any set of parameters that are invalid, will be silently discarded.
+
+The timers will be started as part of \textit{DrHook's} initialisation, and are specified in seconds.
+
+If this option isn't specified, then it will default to \verb|NULL|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_DUMP\_SMAPS"}}
+\label{section:flags:DR_HOOK_DUMP_SMAPS}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies whether \verb|/proc/<process_ID>/smaps| should be dumped when handling a signal or not. This is a developer option.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+% /* Print /proc/<tid>/smaps from signal handler (before moving to ATP or below) */
+\texttt{smaps} will be dumped after the first signal is handled by \drhook, but before signals are handled by other handlers, e.g. \textit{ATP}. It will only be dumped for the process which raises the signal.
+
+\texttt{smaps} will be dumped to \verb|/proc/<process_ID>/smaps|\todo{in which directory?}.
+
+Any non-zero valid integer value will be set to \verb|1|.
+
+If this option isn't specified, then it will default to \verb|0|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_DUMP\_MAPS"}}
+\label{section:flags:DR_HOOK_DUMP_MAPS}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies whether \verb|/proc/<process_ID>/maps| should be dumped when handling a signal or not. This is a developer option.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+\texttt{maps} will be dumped after the first signal is handled by \drhook, but before signals are handled by other handlers, e.g. \textit{ATP}. It will only be dumped for the process which raises the signal.
+
+\texttt{maps} will be dumped to \verb|/proc/<process_ID>/maps|\todo{in which directory?}.
+
+Any non-zero valid integer value will be set to \verb|1|.
+
+If this option isn't specified, then it will default to \verb|0|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_DUMP\_BUDDYINFO"}}
+\label{section:flags:DR_HOOK_DUMP_BUDDYINFO}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies whether \verb|/proc/buddyinfo| should be dumped when handling a signal or not. This is a developer option.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+\texttt{buddyinfo} will be dumped after the first signal is handled by \drhook, but before signals are handled by other handlers, e.g. \textit{ATP}.
+
+\texttt{buddyinfo} can also be dumped during the dumping of hugepages(enabled via \hyperref[section:flags:DR_HOOK_DUMP_HUGEPAGES]{\texttt{"DR\_HOOK\_DUMP\_HUGEPAGES"}}). This occurs during the handling of signals, and when \drhook enters a region.
+
+\texttt{buddyinfo} will be dumped to \verb|/proc/buddyinfo|\todo{in which directory?}.
+
+Any non-zero valid integer value will be set to \verb|1|.
+
+If this option isn't specified, then it will default to \verb|0|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_DUMP\_MEMINFO"}}
+\label{section:flags:DR_HOOK_DUMP_MEMINFO}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies whether \verb|/proc/meminfo| should be dumped when handling a signal or not. This is a developer option.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+\texttt{meminfo} will be dumped after the first signal is handled by \drhook, but before signals are handled by other handlers, e.g. \textit{ATP}.
+
+\texttt{meminfo} can also be dumped during the dumping of hugepages (enabled via \hyperref[section:flags:DR_HOOK_DUMP_HUGEPAGES]{\texttt{"DR\_HOOK\_DUMP\_HUGEPAGES"}}). This occurs during the handling of signals, and when \drhook enters a region.
+
+\texttt{meminfo} will be dumped to \verb|/proc/meminfo|\todo{in which directory?}.
+
+Any non-zero valid integer value will be set to \verb|1|.
+
+If this option isn't specified, then it will default to \verb|0|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_DUMP\_HUGEPAGES"}}
+\label{section:flags:DR_HOOK_DUMP_HUGEPAGES}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <id> ',' <double>+ \\
+\verb+double ::= <double_part> | 'double_part' '.' <double_part>+ \\
+\verb+double_part ::= <digit_0> | <double_part> <digit_0>+ \\
+\verb+digit_0 ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+\\
+\verb+id = <integer> | '-1'+\\
+\verb+integer ::= <digit> | <integer> <digit> | <integer> '0'+ \\
+\verb+digit ::= '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+ Specifies whether \todo{ECMEMINFO} should be dumped or not. This is a developer option.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+The parameters provided to \texttt{"DR\_HOOK\_DUMP\_HUGEPAGES"} (\verb|target_process|,\\ and \verb|frequency|) are in the following pattern:
+
+\verb|target_process, frequency|
+
+Note that:
+\begin{itemize}
+    \item \verb|target_process| can be a valid integer for a single process, or \texttt{-1} for all.
+    \item \verb|frequency| is given in seconds. This is the minimum time that must pass before huge pages are dumped - unless the function has been called with the \texttt{enforced} flag. Although, enforcement isn't currently used within \drhook.
+\end{itemize}
+If either parameters are invalid, both will be silently discarded.
+% \texttt{meminfo} can also be dumped during the dumping of hugepages. This occurs during the handling of signals, and when \drhook enters a region.
+
+Hugepages are only dumped by the first thread.
+
+Hugepage dumping can occur when handling a signal or entering a \drhook region.
+
+\verb|/proc/buddyinfo| and \verb|/proc/meminfo| can also be dumped with hugepages, if \hyperref[section:flags:DR_HOOK_DUMP_BUDDYINFO]{\texttt{"DR\_HOOK\_DUMP\_BUDDYINFO"}} and \hyperref[section:flags:DR_HOOK_DUMP_MEMINFO]{\texttt{"DR\_HOOK\_DUMP\_MEMINFO"}} are enabled respectively.
+
+The dumping of hugepages is handled by ec\_meminfo. \todo{is this right? \& talk about if so}
+
+If this option isn't specified, then it will default to \verb|0,0|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_GENCORE"}}
+\label{section:flags:DR_HOOK_GENCORE}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies whether generating core dumps is enabled or not.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+Any non-zero valid integer value will be treated as \verb|1|.
+
+If this option isn't specified, then it will default to \verb|0|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_GENCORE\_SIGNAL"}}
+\label{section:flags:DR_HOOK_GENCORE_SIGNAL}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <digit> | <valid_value> <digit> | <valid_value> '0'+ \\
+\verb+digit ::= '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies the signal which triggers generating a core dump.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+
+All invalid values will be silently discarded.
+
+If this option isn't specified, then it will default to \verb|0|, which causes it to be ignored.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_STRICT\_REGIONS"}}
+\label{section:flags:DR_HOOK_STRICT_REGIONS}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies if \drhook region entry and exit calls must use the same label.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+\drhook region entry and exit calls can take a string, which is treated as a label for the region. However, while \drhook doesn't use the exit call label, extensions that hijack \drhook calls may need the label as the unique identifier. This flag will cause \drhook to crash instead of passing it to the extension.
+
+Any non-zero valid integer value will be treated as \verb|1|.
+
+If this option isn't specified and \hyperref[section:flags:DR_HOOK_NVTX]{\texttt{"DR\_HOOK\_NVTX"}} is disabled, then it will default to \verb|0|. If \hyperref[section:flags:DR_HOOK_NVTX]{\texttt{"DR\_HOOK\_NVTX"}} is enabled, then \hyperref[section:flags:DR_HOOK_STRICT_REGIONS]{\texttt{"DR\_HOOK\_STRICT\_REGIONS"}} will be enabled regardless of the value given.
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_NVTX"}}
+\label{section:flags:DR_HOOK_NVTX}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies if NVTX should be enabled at runtime or not.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+Enables Nvidia's \href{https://github.com/NVIDIA/NVTX}{NVTX} at runtime. This assumes that NVTX has been enabled and requested at compile time of \drhook using \todo{Link this}\hyperref[section:options:ENABLEDR_HOOK_NVTX]{\texttt{"ENABLEDR\_HOOK\_NVTX"}}.
+
+
+Setting \texttt{"DR\_HOOK\_TIMELINE"} to a non-zero value also causes \drhook to check the following options:
+\begin{itemize}
+    \item \hyperref[section:flags:DR_HOOK_NVTX_SPAM_CALL_COUNT]{\texttt{DR\_HOOK\_NVTX\_SPAM\_CALL\_COUNT}}
+    \item \hyperref[section:flags:DR_HOOK_NVTX_SPAM_WT]{\texttt{DR\_HOOK\_NVTX\_SPAM\_WT}}
+\end{itemize}
+
+Any non-zero valid integer value will be treated as \verb|1|.
+
+If this option isn't specified, then it will default to \verb|0|.
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_NVTX\_SPAM\_CALL\_COUNT"}}
+\label{section:flags:DR_HOOK_NVTX_SPAM_CALL_COUNT}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <digit> | <valid_value> <digit> | <valid_value> '0'+ \\
+\verb+digit ::= '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies the spam call count for NVTX.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+The spam call count is the number of calls of a \drhook region that needs to be reached, without a cumulative runtime longer than the \hyperref[section:flags:DR_HOOK_NVTX_SPAM_WT]{\texttt{DR\_HOOK\_NVTX\_SPAM\_WT}} time, for \drhook to skip subsequent calls of that region for the functionality of NVTX. It will not skip core \drhook profiling.
+
+This option is only available if NVTX is enabled via \hyperref[section:flags:DR_HOOK_NVTX]{\texttt{"DR\_HOOK\_NVTX"}}.
+
+A value less than \verb|0| will be set to the definition of \verb|nvtx_SCC_default|, typically \verb|10|. While it is possible to specify \verb|0|, this will effectively disable NVTX as all regions will be skipped - unless they can accumulate sufficient runtime to satisfy \hyperref[section:flags:DR_HOOK_NVTX_SPAM_WT]{\texttt{DR\_HOOK\_NVTX\_SPAM\_WT}} in their first call.
+
+The size is limited to the size of \verb|int|.
+
+If this option isn't specified, then it will default to the definition of \verb|nvtx_SCC_default|.
+
+% % ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_NVTX\_SPAM\_WT"}}
+\label{section:flags:DR_HOOK_NVTX_SPAM_WT}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <number> | 'number' '.' <number>+ \\
+\verb+number ::= <digit> | <double_part> <digit>+ \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies the spam wall time for NVTX.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+The spam wall time is the cumulative runtime a \drhook region must have if it is not to be skipped for NVTX functionality after exceeding \hyperref[section:flags:DR_HOOK_NVTX_SPAM_CALL_COUNT]{\texttt{DR\_HOOK\_NVTX\_SPAM\_CALL\_COUNT}}. It will not skip core \drhook profiling.
+
+This option is only available if NVTX is enabled via \hyperref[section:flags:DR_HOOK_NVTX]{\texttt{"DR\_HOOK\_NVTX"}}.
+
+\hyperref[section:flags:DR_HOOK_NVTX_SPAM_WT]{\texttt{DR\_HOOK\_NVTX\_SPAM\_WT}} is measured in seconds.
+
+A value less than \verb|0| will be set to the definition of \verb|nvtx_SWT_default|, typically \verb|0.001|.
+
+The size is limited to the size of \verb|double|.
+
+If this option isn't specified, then it will default to the definition of \verb|nvtx_SWT_default|.
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_OPT"}}
+\label{section:flags:DR_HOOK_OPT}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <option> |  <valid_value> <delim> <option>+ \\
+\verb+delim ::= ',' | ' ' | '\t' | '/'+ \\
+\verb+option ::= <all> | <memory> | <heap> | <stack> | <rss> | <paging> |+\\
+\verb+<walltime> | <cputime> | <count> | <memprof> | <cycles> | <cpuprof> |+\\
+\verb+<trim> | <self> | <noself> | <noprop> | <nosize> | <cluster> | <callpath>+ \\
+\verb+all ::= 'ALL'+ \\
+\verb+memory ::= 'MEM' | 'MEMORY'+ \\
+\verb+time ::= 'TIME' | 'TIMES'+ \\
+\verb+heap ::= 'HWM' | 'HEAP'+ \\
+\verb+stack ::= 'STK' | 'STACK'+ \\
+\verb+rss ::= 'RSS'+ \\
+\verb+paging ::= 'PAG' | 'PAGING'+ \\
+\verb+walltime ::= 'WALL' | 'WALLTIME'+ \\
+\verb+cputime ::= 'CPU' | 'CPUTIME'+ \\
+\verb+count ::= 'CALLS' | 'COUNT'+ \\
+\verb+memprof ::= 'MEMPROF'+ \\
+\verb+cycles ::= 'PROF' | 'WALLPROF' | 'CYCLES'+ \\
+\verb+cpuprof ::= 'CPUPROF'+ \\
+\verb+trim ::= 'TRIM'+ \\
+\verb+self ::= 'SELF'+ \\
+\verb+noself ::= 'NOSELF'+ \\
+\verb+noprop ::= 'NOPROP' | 'NOPROPAGATE' | 'NOPROPAGATE_SIGNALS'+ \\
+\verb+nosize ::= 'NOSIZE' | 'NOSIZEINFO'+ \\
+\verb+cluster ::= 'CLUSTER' | 'CLUSTERINFO'+ \\
+\verb+callpath ::= 'CALLPATH'+ \\
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+
+Specifies a range of options relating to profiling parameters and outputs.
+
+
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_CALLPATH\_INDENT"}}
+\label{section:flags:DR_HOOK_CALLPATH_INDENT}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' +\\
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies the number of spaces to indent callpath output by.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+This will only be enabled if \hyperref[section:flags:DR_HOOK_OPT]{\texttt{"DR\_HOOK\_OPT"}} has \texttt{'CALLPATH'} set.
+
+If \texttt{"DR\_HOOK\_CALLPATH\_INDENT"} is less than 1 or greater than 8, then it will be set to \verb|callpath_indent_default|, which evaluates to \verb|2|.
+
+If this option isn't specified, then it will default to \verb|callpath_indent_default|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_CALLPATH\_DEPTH"}}
+\label{section:flags:DR_HOOK_CALLPATH_DEPTH}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <digit> | <valid_value> <digit> + \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Set the maximum depth for tracking callpaths of nested \drhook regions.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+This will only be enabled if \hyperref[section:flags:DR_HOOK_OPT]{\texttt{"DR\_HOOK\_OPT"}} has \texttt{'CALLPATH'} set.
+
+Caution should be used when picking this value, as being too high will greatly increase both the processing and memory overhead of \drhook.
+
+The size is limited to the size of \verb|int|.
+
+If \texttt{"DR\_HOOK\_CALLPATH\_DEPTH"} is less than 0, then it will be set to \verb|callpath_depth_default|, which evaluates to \verb|50|. A size of zero will only print the first \drhook region in the callpath.
+
+If this option isn't specified, then it will default to \verb|callpath_depth_default||.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_CALLPATH\_PACKED"}}
+\label{section:flags:DR_HOOK_CALLPATH_PACKED}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1' +\\
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Outputs callpath information in a more compact format.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+This will only be enabled if \hyperref[section:flags:DR_HOOK_OPT]{\texttt{"DR\_HOOK\_OPT"}} has \texttt{'CALLPATH'} set.
+
+Any non-zero valid integer value will be set to \verb|1|.
+
+If this option isn't specified, then it will default to \verb|0|.
+
+\todo{Compare the two}
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_CALLTRACE"}}
+\label{section:flags:DR_HOOK_CALLTRACE}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= '0' | '1' +\\
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies if calltrace mode should be enabled or not.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+This will only be enabled if \hyperref[section:flags:DR_HOOK_OPT]{\texttt{"DR\_HOOK\_OPT"}} has \texttt{'CALLPATH'} set.
+
+\todo{elaborate}
+
+Any non-zero valid integer value will be set to \verb|1|.
+
+If this option isn't specified, then it will default to \verb|0|.
+
+\todo{Not tested}
+
+% ###############################################
+
+\subsection{\texttt{"DR\_HOOK\_WATCH\_PRINT\_MAX"}}
+\label{section:flags:DR_HOOK_WATCH_PRINT_MAX}
+%\vspace{-2ex}
+\subsubsection{Valid Values}
+%\vspace{-2ex}
+\verb+valid_value ::= <digit> | <valid_value> <digit> + \\
+\verb+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'+
+
+%\vspace{-2ex}
+\subsubsection{Purpose}
+%\vspace{-2ex}
+Specifies the max number of elements per array to be printed per watchpoint.
+
+%\vspace{-2ex}
+\subsubsection{Notes}
+%\vspace{-2ex}
+If \texttt{"DR\_HOOK\_WATCH\_PRINT\_MAX"} is greater or equal to 0, and less than the number of elements, then the number of elements up to the value of \texttt{"DR\_HOOK\_WATCH\_PRINT\_MAX"} will be printed.
+
+The size is limited to the size of \verb|int|.
+
+If this option isn't specified, then it will default to \verb|-1|.
+
+\todo{Not tested}
+
+% ###############################################
+
+% \subsection{\texttt{p}}
+% \label{section:flags:}
+% %\vspace{-2ex}
+% \subsubsection{Valid Values}
+% %\vspace{-2ex}
+
+% %\vspace{-2ex}
+% \subsubsection{Purpose}
+% %\vspace{-2ex}
+
+% %\vspace{-2ex}
+% \subsubsection{Notes}
+% %\vspace{-2ex}
+
+% ###############################################
