@@ -3,6 +3,8 @@ name: Make docs
 on:
   pull_request:
     branches: [ "main", "develop" ]
+    paths: 
+    - 'drhook/**'
 
 jobs:
   build:
