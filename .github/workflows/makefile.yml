@@ -33,4 +33,5 @@ jobs:
       run: make -C drhook markdown
 
     - name: Check diff
-      run: git diff --exit-code  -- drhook/_build/markdown
+      # Don't check latexpdf as it's not fully deterministic & it's not a priority anyway
+      run: git diff --exit-code  -- drhook/_build/markdown drhook/_build/html
