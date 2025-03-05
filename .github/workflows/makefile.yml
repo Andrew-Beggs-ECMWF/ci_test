@@ -20,8 +20,10 @@ jobs:
     - uses: awalsh128/cache-apt-pkgs-action@v1.4.3
       with:
         packages: latexmk texlive-latex-extra # Caching apt dependencies
-        execute_install_scripts: true
     - run: pip install -r requirements.txt
+
+    - name: Install latexmk
+      run: sudo apt install -y latexmk
 
     - name: Make html
       run: make -C drhook html
