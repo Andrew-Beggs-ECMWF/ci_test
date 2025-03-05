@@ -3,6 +3,8 @@ name: Make docs
 on:
   pull_request:
     branches: [ "main", "develop" ]
+    paths: 
+    - 'drhook/**'
 
 jobs:
   build:
@@ -14,8 +16,11 @@ jobs:
     - uses: actions/setup-python@v5
       with:
         python-version: '3.13'
-        cache: 'pip' # caching pip dependencies
+        cache: 'pip' # Caching pip dependencies
     - run: pip install -r requirements.txt
+
+    - name: Install latexmk
+      run: sudo apt install -y latexmk texlive-latex-extra
 
     - name: Make html
       run: make -C drhook html
@@ -25,3 +30,8 @@ jobs:
 
     - name: Make md
       run: make -C drhook markdown
+
+    - name: Check diff
+      # Don't check latexpdf or drhook/_build/html as they contain version hashes etc
+      # They get rebuilt as part of cd, so just a ci check that they're not broken is fine
+      run: git diff --exit-code  -- drhook/_build/markdown
