@@ -16,10 +16,11 @@ jobs:
     - uses: actions/setup-python@v5
       with:
         python-version: '3.13'
-        cache: 'pip' # caching pip dependencies
+        cache: 'pip' # Caching pip dependencies
     - run: pip install -r requirements.txt
 
     - name: Install latexmk
+      # TODO: Cache this
       run: sudo apt install -y latexmk texlive-latex-extra
 
     - name: Make html
@@ -30,3 +31,6 @@ jobs:
 
     - name: Make md
       run: make -C drhook markdown
+
+    - name: Check diff
+      run: git diff --exit-code  -- drhook/_build drhook/_templates
