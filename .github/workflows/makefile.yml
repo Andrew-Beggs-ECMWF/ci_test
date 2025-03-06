@@ -1,12 +1,13 @@
-name: Make docs
+name: Check Docs
 
 on:
   pull_request:
     branches: [ "main", "develop" ]
+    paths: 
+    - 'drhook/**'
 
 jobs:
-  build:
-
+  Check_html:
     runs-on: ubuntu-latest
 
     steps:
@@ -14,14 +15,45 @@ jobs:
     - uses: actions/setup-python@v5
       with:
         python-version: '3.13'
-        cache: 'pip' # caching pip dependencies
+        cache: 'pip' # Caching pip dependencies
     - run: pip install -r requirements.txt
 
     - name: Make html
       run: make -C drhook html
 
-    - name: Make pdf
-      run: make -C drhook latexpdf
+  Check_pdf:
+      runs-on: ubuntu-latest
+      container: ghcr.io/andrew-beggs-ecmwf/ubuntu_latexmk:latest
+  
+      steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.3'
+          cache: 'pip' # Caching pip dependencies
+      - run: pip install -r requirements.txt
 
-    - name: Make md
-      run: make -C drhook markdown
+      - name: Install latexmk
+        run: sudo apt install -y latexmk texlive-latex-extra make
+
+      - name: Make pdf
+        run: make -C drhook latexpdf
+  
+  Check_markdown:
+      runs-on: ubuntu-latest
+  
+      steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip' # Caching pip dependencies
+      - run: pip install -r requirements.txt
+
+      - name: Make md
+        run: make -C drhook markdown
+
+      - name: Check diff
+        # Don't check latexpdf or drhook/_build/html as they contain version hashes etc
+        # They get rebuilt as part of cd, so just a ci check that they're not broken is fine
+        run: git diff --exit-code  -- drhook/_build/markdown
