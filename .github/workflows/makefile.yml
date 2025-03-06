@@ -23,6 +23,7 @@ jobs:
 
   Check_pdf:
       runs-on: ubuntu-latest
+      container: ghcr.io/andrew-beggs-ecmwf/ubuntu_latexmk:latest
   
       steps:
       - uses: actions/checkout@v4
