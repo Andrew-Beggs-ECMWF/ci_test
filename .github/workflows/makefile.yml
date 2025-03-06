@@ -34,7 +34,7 @@ jobs:
       - run: pip install -r requirements.txt
 
       - name: Install latexmk
-        run: sudo apt install -y latexmk texlive-latex-extra
+        run: sudo apt install -y latexmk texlive-latex-extra make
 
       - name: Make pdf
         run: make -C drhook latexpdf
