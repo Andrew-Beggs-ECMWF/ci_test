@@ -23,18 +23,17 @@ jobs:
 
   Check_pdf:
       runs-on: ubuntu-latest
-      container: ghcr.io/andrew-beggs-ecmwf/ubuntu_latexmk:latest
   
       steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12.3'
+          python-version: '3.13'
           cache: 'pip' # Caching pip dependencies
       - run: pip install -r requirements.txt
 
       - name: Install latexmk
-        run: sudo apt install -y latexmk texlive-latex-extra make
+        run: sudo apt install -y latexmk texlive-latex-extra
 
       - name: Make pdf
         run: make -C drhook latexpdf
