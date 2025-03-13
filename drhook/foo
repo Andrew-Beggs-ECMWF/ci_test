@@ -1,4 +1,4 @@
-\section{Flags \& Environment variables} 
+\section{Flags \& Environment variables}
 
 \subsection{\texttt{"DR\_HOOK\_SHOW\_LOCK"}}
 \label{section:flags:DR_HOOK_SHOW_LOCK}
